@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TAB DASH</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07090d;
+      --panel: #101722;
+      --panel-2: #151f2e;
+      --text: #e9f2ff;
+      --muted: #96a6ba;
+      --accent: #73ffb0;
+      --danger: #ff5e73;
+      --line: #2a374a;
+      --button: #203148;
+      --button-hover: #2d4566;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top, rgba(115, 255, 176, 0.12), transparent 34rem),
+        var(--bg);
+      color: var(--text);
+      font-family: "Cascadia Mono", "Consolas", "Menlo", monospace;
+    }
+
+    main {
+      width: min(920px, 100%);
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(21, 31, 46, 0.96), rgba(16, 23, 34, 0.96));
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      letter-spacing: 0.18em;
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      color: var(--accent);
+      text-align: center;
+      text-shadow: 0 0 16px rgba(115, 255, 176, 0.28);
+    }
+
+    .tagline {
+      margin: 0 auto 24px;
+      max-width: 62ch;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.55;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .value {
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+
+    .value.danger {
+      color: var(--danger);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 16px 0 24px;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 12px 18px;
+      background: var(--button);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+    }
+
+    button:hover,
+    button:focus-visible {
+      background: var(--button-hover);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    section {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(6, 8, 12, 0.45);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    p,
+    ul {
+      margin-top: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    ul {
+      padding-left: 1.25rem;
+      margin-bottom: 0;
+    }
+
+    kbd {
+      display: inline-block;
+      min-width: 1.8em;
+      padding: 0.1em 0.45em;
+      border: 1px solid var(--line);
+      border-bottom-width: 3px;
+      border-radius: 6px;
+      background: #08101a;
+      color: var(--text);
+      text-align: center;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .legend span {
+      color: var(--text);
+    }
+
+    @media (max-width: 720px) {
+      main {
+        padding: 20px;
+      }
+
+      .stats,
+      .grid,
+      .legend {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>TAB DASH</h1>
+    <p class="tagline">
+      Focus this page, then watch the browser tab title: that is the gameplay display.
+      Track your score below while the action stays in the tab.
+    </p>
+
+    <div class="stats" aria-label="Game stats">
+      <div class="stat">
+        <span class="label">Score</span>
+        <span id="score" class="value">00000</span>
+      </div>
+      <div class="stat">
+        <span class="label">Best this session</span>
+        <span id="best" class="value">00000</span>
+      </div>
+      <div class="stat">
+        <span class="label">Status</span>
+        <span id="status" class="value">Ready / Sound on</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="startButton" type="button">Start / Restart</button>
+      <button id="muteButton" type="button">Mute</button>
+    </div>
+
+    <div class="grid">
+      <section>
+        <h2>How to run</h2>
+        <p>
+          Your runner stays at the front of the tab title while the road scrolls left.
+          Jump over <strong>▄</strong>, slide under <strong>▀</strong>, and keep the action near the
+          front because browser tabs often truncate long titles from the end.
+        </p>
+        <ul>
+          <li><kbd>Space</kbd>, <kbd>W</kbd>, or <kbd>↑</kbd> jumps.</li>
+          <li><kbd>S</kbd> or <kbd>↓</kbd> slides.</li>
+          <li><kbd>R</kbd> restarts after a crash.</li>
+          <li><kbd>M</kbd> toggles sound.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Glyph legend</h2>
+        <ul class="legend">
+          <li><span>●</span> running</li>
+          <li><span>⌃</span> jumping / rising</li>
+          <li><span>⌄</span> falling / landing</li>
+          <li><span>▁</span> sliding</li>
+          <li><span>▲</span> cleared low block</li>
+          <li><span>═</span> cleared high block</li>
+          <li><span>✖</span> crash</li>
+          <li><span>_</span> empty road</li>
+          <li><span>▄</span> low block</li>
+          <li><span>▀</span> high block</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    "use strict";
+
+    const GLYPH = {
+      run: "●",
+      jumpUp: "⌃",
+      fall: "⌄",
+      slide: "▁",
+      clearLow: "▲",
+      clearHigh: "═",
+      crash: "✖",
+      empty: "_",
+      low: "▄",
+      high: "▀"
+    };
+
+    const TRACK_LENGTH = 11;
+    const PLAYER_TILE_INDEX = 0;
+    const JUMP_TICKS = 4;
+    const SLIDE_TICKS = 4;
+    const INITIAL_TICK_MS = 140;
+    const MIN_TICK_MS = 92;
+    const INITIAL_GAP = 6;
+    const MIN_GAP = 3;
+    const OBSTACLE_CHANCE = 0.42;
+
+    const scoreEl = document.querySelector("#score");
+    const bestEl = document.querySelector("#best");
+    const statusEl = document.querySelector("#status");
+    const startButton = document.querySelector("#startButton");
+    const muteButton = document.querySelector("#muteButton");
+
+    let audioContext = null;
+    let muted = false;
+    let loopId = 0;
+    let track = GLYPH.empty.repeat(TRACK_LENGTH);
+    let score = 0;
+    let bestScore = 0;
+    let jumpTicks = 0;
+    let slideTicks = 0;
+    let gapUntilObstacle = INITIAL_GAP;
+    let crashed = false;
+    let started = false;
+    let titleLine = "";
+    let lastClearScore = -1;
+    let frameGlyphOverride = "";
+
+    function formatScore(value) {
+      return String(value).padStart(5, "0");
+    }
+
+    function currentSpeed() {
+      return Math.max(MIN_TICK_MS, INITIAL_TICK_MS - Math.floor(score / 120) * 4);
+    }
+
+    function currentMinimumGap() {
+      const reduction = Math.floor(score / 150);
+      return Math.max(MIN_GAP, INITIAL_GAP - reduction);
+    }
+
+    function initializeAudio() {
+      if (!audioContext) {
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtor) {
+          audioContext = new AudioCtor();
+        }
+      }
+
+      if (audioContext && audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    }
+
+    function playTone({ type = "sine", startFrequency, endFrequency, duration, gain = 0.045 }) {
+      if (muted || !audioContext) {
+        return;
+      }
+
+      const now = audioContext.currentTime;
+      const oscillator = audioContext.createOscillator();
+      const volume = audioContext.createGain();
+
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(startFrequency, now);
+      oscillator.frequency.exponentialRampToValueAtTime(endFrequency, now + duration);
+      volume.gain.setValueAtTime(0.0001, now);
+      volume.gain.exponentialRampToValueAtTime(gain, now + 0.012);
+      volume.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      oscillator.connect(volume);
+      volume.connect(audioContext.destination);
+      oscillator.start(now);
+      oscillator.stop(now + duration + 0.02);
+    }
+
+    function playNoiseBuzz() {
+      if (muted || !audioContext) {
+        return;
+      }
+
+      const now = audioContext.currentTime;
+      const duration = 0.22;
+      const bufferSize = Math.floor(audioContext.sampleRate * duration);
+      const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for (let i = 0; i < bufferSize; i += 1) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+      }
+
+      const noise = audioContext.createBufferSource();
+      const filter = audioContext.createBiquadFilter();
+      const volume = audioContext.createGain();
+
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(900, now);
+      filter.frequency.exponentialRampToValueAtTime(120, now + duration);
+      volume.gain.setValueAtTime(0.07, now);
+      volume.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      noise.buffer = buffer;
+      noise.connect(filter);
+      filter.connect(volume);
+      volume.connect(audioContext.destination);
+      noise.start(now);
+    }
+
+    const sound = {
+      jump() {
+        playTone({ startFrequency: 380, endFrequency: 720, duration: 0.09 });
+      },
+      slide() {
+        playTone({ type: "triangle", startFrequency: 210, endFrequency: 120, duration: 0.1 });
+      },
+      clear() {
+        playTone({ startFrequency: 620, endFrequency: 880, duration: 0.07, gain: 0.035 });
+      },
+      crash() {
+        playNoiseBuzz();
+      },
+      restart() {
+        playTone({ startFrequency: 440, endFrequency: 660, duration: 0.08, gain: 0.04 });
+      }
+    };
+
+    function getActionGlyph(overlappingTile) {
+      if (crashed) {
+        return GLYPH.crash;
+      }
+
+      if (overlappingTile === GLYPH.low && jumpTicks > 0) {
+        return GLYPH.clearLow;
+      }
+
+      if (overlappingTile === GLYPH.high && slideTicks > 0) {
+        return GLYPH.clearHigh;
+      }
+
+      if (slideTicks > 0) {
+        return GLYPH.slide;
+      }
+
+      if (jumpTicks > 0) {
+        return jumpTicks > JUMP_TICKS / 2 ? GLYPH.jumpUp : GLYPH.fall;
+      }
+
+      return GLYPH.run;
+    }
+
+    function render() {
+      if (crashed) {
+        titleLine = `${GLYPH.crash}___GAME_OVER___`;
+      } else {
+        const glyph = frameGlyphOverride || getActionGlyph(track[PLAYER_TILE_INDEX]);
+        titleLine = `${glyph}${track}`;
+      }
+
+      frameGlyphOverride = "";
+      document.title = titleLine;
+      scoreEl.textContent = formatScore(score);
+      bestEl.textContent = formatScore(bestScore);
+
+      const state = crashed ? "Crashed" : started ? "Running" : "Ready";
+      statusEl.textContent = `${state} / ${muted ? "Muted" : "Sound on"}`;
+      statusEl.classList.toggle("danger", crashed);
+      muteButton.textContent = muted ? "Unmute" : "Mute";
+    }
+
+    function chooseNextTile() {
+      if (gapUntilObstacle > 0) {
+        gapUntilObstacle -= 1;
+        return GLYPH.empty;
+      }
+
+      if (Math.random() > OBSTACLE_CHANCE) {
+        return GLYPH.empty;
+      }
+
+      gapUntilObstacle = currentMinimumGap() + Math.floor(Math.random() * 3);
+      return Math.random() < 0.5 ? GLYPH.low : GLYPH.high;
+    }
+
+    function stopLoop() {
+      if (loopId) {
+        clearInterval(loopId);
+        loopId = 0;
+      }
+    }
+
+    function scheduleLoop() {
+      stopLoop();
+      if (!crashed && started) {
+        loopId = window.setInterval(tick, currentSpeed());
+      }
+    }
+
+    function restart() {
+      initializeAudio();
+      stopLoop();
+      track = GLYPH.empty.repeat(TRACK_LENGTH);
+      score = 0;
+      jumpTicks = 0;
+      slideTicks = 0;
+      gapUntilObstacle = INITIAL_GAP;
+      crashed = false;
+      started = true;
+      lastClearScore = -1;
+      frameGlyphOverride = "";
+      sound.restart();
+      render();
+      scheduleLoop();
+    }
+
+    function crash() {
+      crashed = true;
+      bestScore = Math.max(bestScore, score);
+      sound.crash();
+      stopLoop();
+      render();
+    }
+
+    function startJump() {
+      if (crashed) {
+        return;
+      }
+
+      initializeAudio();
+      if (!started) {
+        restart();
+      }
+
+      if (jumpTicks === 0 && slideTicks === 0) {
+        jumpTicks = JUMP_TICKS;
+        sound.jump();
+        render();
+      }
+    }
+
+    function startSlide() {
+      if (crashed) {
+        return;
+      }
+
+      initializeAudio();
+      if (!started) {
+        restart();
+      }
+
+      if (jumpTicks === 0 && slideTicks === 0) {
+        slideTicks = SLIDE_TICKS;
+        sound.slide();
+        render();
+      }
+    }
+
+    function handleClearSound(glyph) {
+      const clearedObstacle = glyph === GLYPH.clearLow || glyph === GLYPH.clearHigh;
+      if (clearedObstacle && lastClearScore !== score) {
+        lastClearScore = score;
+        sound.clear();
+      }
+    }
+
+    function tick() {
+      const currentTile = track[PLAYER_TILE_INDEX];
+      const safeLow = currentTile === GLYPH.low && jumpTicks > 0;
+      const safeHigh = currentTile === GLYPH.high && slideTicks > 0;
+      const hitLow = currentTile === GLYPH.low && !safeLow;
+      const hitHigh = currentTile === GLYPH.high && !safeHigh;
+      const displayGlyph = getActionGlyph(currentTile);
+
+      handleClearSound(displayGlyph);
+
+      if (hitLow || hitHigh) {
+        crash();
+        return;
+      }
+
+      if (jumpTicks > 0) {
+        jumpTicks -= 1;
+      }
+
+      if (slideTicks > 0) {
+        slideTicks -= 1;
+      }
+
+      track = track.slice(1) + chooseNextTile();
+      score += 1;
+      bestScore = Math.max(bestScore, score);
+      frameGlyphOverride = displayGlyph;
+      render();
+      scheduleLoop();
+    }
+
+    function toggleMute() {
+      initializeAudio();
+      muted = !muted;
+      render();
+    }
+
+    function handleKeydown(event) {
+      const actionKeys = [" ", "ArrowUp", "ArrowDown", "w", "W", "s", "S", "r", "R", "m", "M"];
+      if (!actionKeys.includes(event.key)) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (event.key === " " || event.key === "ArrowUp" || event.key === "w" || event.key === "W") {
+        startJump();
+      } else if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") {
+        startSlide();
+      } else if (event.key === "r" || event.key === "R") {
+        restart();
+      } else if (event.key === "m" || event.key === "M") {
+        toggleMute();
+      }
+    }
+
+    startButton.addEventListener("click", restart);
+    muteButton.addEventListener("click", toggleMute);
+    window.addEventListener("keydown", handleKeydown);
+
+    render();
+  </script>
+</body>
+</html>
